@@ -20,56 +20,88 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 12px;
             display: flex;
             justify-content: center;
         }
 
         .container {
             width: 100%;
-            max-width: 850px;
+            max-width: 800px;
             background: var(--card-bg);
-            padding: 24px;
+            padding: 16px;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
         }
 
         h1 {
             text-align: center;
-            margin-top: 0;
+            margin-top: 5px;
+            margin-bottom: 16px;
+            font-size: 1.4rem;
             color: #111827;
         }
 
         .input-group {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 20px;
-            align-items: center;
-            flex-wrap: wrap;
+            background-color: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .input-row-1 {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .input-row-2 {
+            display: flex;
+            gap: 8px;
+            width: 100%;
         }
 
         input[type="text"] {
-            padding: 10px 14px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 15px;
             outline: none;
+            box-sizing: border-box;
         }
 
         input[type="text"]:focus {
             border-color: var(--primary);
         }
 
+        #mangaName {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #mangaProgress {
+            flex: 1;
+            min-width: 0;
+        }
+
         .toggle-btn {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background-color: #e5e7eb;
             color: #374151;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 14px;
             transition: all 0.2s;
             user-select: none;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .toggle-btn.active-main {
@@ -84,9 +116,6 @@
             border-color: #d97706;
         }
 
-        #mangaName { flex: 2; min-width: 180px; }
-        #mangaProgress { flex: 1; min-width: 120px; }
-
         button.btn-primary {
             padding: 10px 16px;
             background-color: var(--primary);
@@ -94,23 +123,31 @@
             border: none;
             border-radius: 6px;
             font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         button.btn-primary:hover { background-color: var(--primary-hover); }
 
-        .btn-danger { background-color: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer;}
-        .btn-danger:hover { background-color: #dc2626; }
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
 
         th, td {
-            padding: 12px;
+            padding: 10px 6px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
@@ -118,25 +155,47 @@
         th {
             background-color: #f9fafb;
             font-weight: 600;
+            font-size: 14px;
+        }
+
+        .manga-title {
+            font-weight: bold;
+            font-size: 15px;
+            word-break: break-word;
         }
 
         .table-input-group {
             display: flex;
             gap: 6px;
             align-items: center;
+            width: 100%;
+        }
+
+        .table-input-group input[type="text"] {
+            flex: 1;
+            min-width: 0; /* 讓 input 在 flex 佈局下能順利縮小而不爆頁 */
+            padding: 8px;
+            font-size: 14px;
         }
 
         .btn-small {
-            padding: 6px 12px;
+            padding: 8px 10px;
             font-size: 13px;
         }
 
         .tools {
             display: flex;
+            gap: 10px;
             justify-content: space-between;
             margin-top: 20px;
             padding-top: 15px;
             border-top: 1px solid var(--border-color);
+        }
+
+        .tools button {
+            flex: 1;
+            font-size: 13px;
+            padding: 8px 4px;
         }
     </style>
 </head>
@@ -145,21 +204,25 @@
 <div class="container">
     <h1>📚 漫畫追更記錄本</h1>
     
-    <!-- 新增漫畫欄位 -->
+    <!-- 新增漫畫欄位（優化手機版雙行佈局） -->
     <div class="input-group">
-        <input type="text" id="mangaName" placeholder="漫畫名稱（例如：魔咒）">
-        <button type="button" id="typeToggle" class="toggle-btn active-main" onclick="toggleTypeInput()">正傳</button>
-        <input type="text" id="mangaProgress" placeholder="話數或內容（例如：60）">
-        <button class="btn-primary" onclick="addManga()">新增 / 更新</button>
+        <div class="input-row-1">
+            <input type="text" id="mangaName" placeholder="漫畫名稱（例如：魔咒）">
+        </div>
+        <div class="input-row-2">
+            <button type="button" id="typeToggle" class="toggle-btn active-main" onclick="toggleTypeInput()">正傳</button>
+            <input type="text" id="mangaProgress" placeholder="話數（例：60）">
+            <button class="btn-primary" onclick="addManga()">新增/更新</button>
+        </div>
     </div>
 
     <!-- 漫畫列表表格 -->
     <table>
         <thead>
             <tr>
-                <th>漫畫名稱</th>
-                <th>目前進度</th>
-                <th style="width: 80px;">操作</th>
+                <th style="width: 35%;">漫畫名稱</th>
+                <th style="width: 48%;">進度</th>
+                <th style="width: 17%;">操作</th>
             </tr>
         </thead>
         <tbody id="mangaList"></tbody>
@@ -167,8 +230,8 @@
 
     <!-- 資料匯入匯出備份 -->
     <div class="tools">
-        <button class="btn-primary" onclick="exportData()" style="background-color: #059669;">匯出JSON備份</button>
-        <button class="btn-primary" onclick="document.getElementById('importFile').click()" style="background-color: #d97706;">匯入JSON備份</button>
+        <button class="btn-primary" onclick="exportData()" style="background-color: #059669;">匯出備份</button>
+        <button class="btn-primary" onclick="document.getElementById('importFile').click()" style="background-color: #d97706;">匯入備份</button>
         <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
     </div>
 </div>
@@ -176,7 +239,6 @@
 <script>
     let currentInputType = 'main';
 
-    // 預設資料（初次在手機開啟時自動寫入）
     const initialData = [
         { name: "1995青春報告", type: "main", value: "60" },
         { name: "疏導危機", type: "main", value: "86" },
@@ -230,11 +292,11 @@
             const btnText = isMain ? '正傳' : '外傳';
 
             tr.innerHTML = `
-                <td><strong>${item.name}</strong></td>
+                <td class="manga-title">${item.name}</td>
                 <td>
                     <div class="table-input-group">
                         <button type="button" class="${btnClass}" onclick="toggleRowType(${index})">${btnText}</button>
-                        <input type="text" value="${item.value}" onchange="updateRowValue(${index}, this.value)" style="padding:6px 10px; border:1px solid #ccc; border-radius:4px; width:60%;">
+                        <input type="text" value="${item.value}" onchange="updateRowValue(${index}, this.value)">
                     </div>
                 </td>
                 <td>
