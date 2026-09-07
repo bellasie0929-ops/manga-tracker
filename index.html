@@ -27,7 +27,7 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 600px;
             background: var(--card-bg);
             padding: 16px;
             border-radius: 12px;
@@ -45,8 +45,8 @@
 
         .input-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 20px;
             background-color: #f9fafb;
             padding: 12px;
@@ -54,13 +54,7 @@
             border: 1px solid var(--border-color);
         }
 
-        .input-row-1 {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .input-row-2 {
+        .input-row-1, .input-row-2 {
             display: flex;
             gap: 8px;
             width: 100%;
@@ -79,18 +73,13 @@
             border-color: var(--primary);
         }
 
-        #mangaName {
-            flex: 1;
-            min-width: 0;
-        }
-
-        #mangaProgress {
+        #mangaName, #mangaProgress {
             flex: 1;
             min-width: 0;
         }
 
         .toggle-btn {
-            padding: 8px 12px;
+            padding: 8px 14px;
             background-color: #e5e7eb;
             color: #374151;
             border: 1px solid #d1d5db;
@@ -139,48 +128,45 @@
             cursor: pointer;
             white-space: nowrap;
             flex-shrink: 0;
+            padding: 8px 12px;
+            font-size: 13px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        /* 漫畫列表：分兩行的卡片樣式 */
+        .manga-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        th, td {
-            padding: 10px 6px;
-            text-align: left;
+        .manga-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
             border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            background-color: #f9fafb;
-            font-weight: 600;
-            font-size: 14px;
+            background-color: #fff;
         }
 
         .manga-title {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 16px;
+            color: #1f2937;
             word-break: break-word;
         }
 
-        .table-input-group {
+        .manga-controls {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
             width: 100%;
         }
 
-        .table-input-group input[type="text"] {
+        .manga-controls input[type="text"] {
             flex: 1;
-            min-width: 0; /* 讓 input 在 flex 佈局下能順利縮小而不爆頁 */
-            padding: 8px;
-            font-size: 14px;
-        }
-
-        .btn-small {
+            min-width: 0;
             padding: 8px 10px;
-            font-size: 13px;
+            font-size: 15px;
         }
 
         .tools {
@@ -195,7 +181,7 @@
         .tools button {
             flex: 1;
             font-size: 13px;
-            padding: 8px 4px;
+            padding: 10px 4px;
         }
     </style>
 </head>
@@ -204,7 +190,7 @@
 <div class="container">
     <h1>📚 漫畫追更記錄本</h1>
     
-    <!-- 新增漫畫欄位（優化手機版雙行佈局） -->
+    <!-- 新增漫畫欄位 -->
     <div class="input-group">
         <div class="input-row-1">
             <input type="text" id="mangaName" placeholder="漫畫名稱（例如：魔咒）">
@@ -216,17 +202,8 @@
         </div>
     </div>
 
-    <!-- 漫畫列表表格 -->
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 35%;">漫畫名稱</th>
-                <th style="width: 48%;">進度</th>
-                <th style="width: 17%;">操作</th>
-            </tr>
-        </thead>
-        <tbody id="mangaList"></tbody>
-    </table>
+    <!-- 漫畫列表清單（手機優化雙行版） -->
+    <div id="mangaList" class="manga-list"></div>
 
     <!-- 資料匯入匯出備份 -->
     <div class="tools">
@@ -282,28 +259,25 @@
     }
 
     function render() {
-        const tbody = document.getElementById('mangaList');
-        tbody.innerHTML = '';
+        const listContainer = document.getElementById('mangaList');
+        listContainer.innerHTML = '';
         mangaList.forEach((item, index) => {
-            const tr = document.createElement('tr');
+            const div = document.createElement('div');
+            div.className = 'manga-item';
             
             const isMain = item.type !== 'extra';
             const btnClass = isMain ? 'toggle-btn active-main' : 'toggle-btn active-extra';
             const btnText = isMain ? '正傳' : '外傳';
 
-            tr.innerHTML = `
-                <td class="manga-title">${item.name}</td>
-                <td>
-                    <div class="table-input-group">
-                        <button type="button" class="${btnClass}" onclick="toggleRowType(${index})">${btnText}</button>
-                        <input type="text" value="${item.value}" onchange="updateRowValue(${index}, this.value)">
-                    </div>
-                </td>
-                <td>
-                    <button class="btn-danger btn-small" onclick="deleteManga(${index})">刪除</button>
-                </td>
+            div.innerHTML = `
+                <div class="manga-title">${item.name}</div>
+                <div class="manga-controls">
+                    <button type="button" class="${btnClass}" onclick="toggleRowType(${index})">${btnText}</button>
+                    <input type="text" value="${item.value}" onchange="updateRowValue(${index}, this.value)">
+                    <button class="btn-danger" onclick="deleteManga(${index})">刪除</button>
+                </div>
             `;
-            tbody.appendChild(tr);
+            listContainer.appendChild(div);
         });
         localStorage.setItem('mangaListData', JSON.stringify(mangaList));
     }
