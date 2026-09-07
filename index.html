@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>漫畫追更記錄本（多使用者版）</title>
+    <title>漫畫追更記錄本</title>
     <style>
         :root {
             --bg-color: #f4f6f9;
@@ -38,31 +38,6 @@
             text-align: center;
             margin-top: 0;
             color: #111827;
-        }
-
-        .user-switch-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #eef2ff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #c7d2fe;
-        }
-
-        .user-switch-bar label {
-            font-weight: bold;
-            color: #3730a3;
-        }
-
-        select {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            font-size: 15px;
-            outline: none;
-            cursor: pointer;
         }
 
         .input-group {
@@ -170,19 +145,6 @@
 <div class="container">
     <h1>📚 漫畫追更記錄本</h1>
     
-    <!-- 使用者切換列 -->
-    <div class="user-switch-bar">
-        <label for="userSelect">👤 當前使用者：</label>
-        <div>
-            <select id="userSelect" onchange="switchUser(this.value)">
-                <option value="使用者A">使用者 A</option>
-                <option value="使用者B">使用者 B</option>
-                <option value="使用者C">使用者 C</option>
-            </select>
-            <button onclick="renameCurrentUser()" style="margin-left: 8px; padding: 6px 10px; font-size: 13px;">改名</button>
-        </div>
-    </div>
-
     <!-- 新增漫畫欄位 -->
     <div class="input-group">
         <input type="text" id="mangaName" placeholder="漫畫名稱（例如：魔咒）">
@@ -205,7 +167,7 @@
 
     <!-- 資料匯入匯出備份 -->
     <div class="tools">
-        <button class="btn-primary" onclick="exportData()" style="background-color: #059669;">匯出該使用者JSON備份</button>
+        <button class="btn-primary" onclick="exportData()" style="background-color: #059669;">匯出JSON備份</button>
         <button class="btn-primary" onclick="document.getElementById('importFile').click()" style="background-color: #d97706;">匯入JSON備份</button>
         <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
     </div>
@@ -213,10 +175,9 @@
 
 <script>
     let currentInputType = 'main';
-    let currentUser = localStorage.getItem('manga_current_user') || '使用者A';
 
-    // 預設資料（僅第一次無資料時代入給使用者 A）
-    const defaultDataA = [
+    // 預設資料（初次在手機開啟時自動寫入）
+    const initialData = [
         { name: "1995青春報告", type: "main", value: "60" },
         { name: "疏導危機", type: "main", value: "86" },
         { name: "PASSION", type: "main", value: "138" },
@@ -243,51 +204,7 @@
         { name: "應念而至", type: "main", value: "59" }
     ];
 
-    let mangaList = [];
-
-    function initUserSelect() {
-        document.getElementById('userSelect').value = currentUser;
-        loadUserData();
-    }
-
-    function loadUserData() {
-        const savedData = localStorage.getItem(`mangaData_${currentUser}`);
-        if (savedData) {
-            mangaList = JSON.parse(savedData);
-        } else {
-            // 如果是使用者 A 且完全沒儲存過，給予預設資料；其他使用者預設給空陣列
-            mangaList = (currentUser === '使用者A') ? defaultDataA : [];
-        }
-        render();
-    }
-
-    function switchUser(newUser) {
-        currentUser = newUser;
-        localStorage.setItem('manga_current_user', currentUser);
-        loadUserData();
-    }
-
-    function renameCurrentUser() {
-        const newName = prompt("請輸入新的使用者名稱：", currentUser);
-        if (newName && newName.trim() !== "") {
-            const oldUser = currentUser;
-            currentUser = newName.trim();
-            
-            // 轉移資料
-            const data = localStorage.getItem(`mangaData_${oldUser}`);
-            if (data) {
-                localStorage.setItem(`mangaData_${currentUser}`, data);
-                localStorage.removeItem(`mangaData_${oldUser}`);
-            }
-
-            // 更新下拉選單 Option
-            const select = document.getElementById('userSelect');
-            select.options[select.selectedIndex].value = currentUser;
-            select.options[select.selectedIndex].text = currentUser;
-
-            localStorage.setItem('manga_current_user', currentUser);
-        }
-    }
+    let mangaList = JSON.parse(localStorage.getItem('mangaListData')) || initialData;
 
     function toggleTypeInput() {
         const btn = document.getElementById('typeToggle');
@@ -326,7 +243,7 @@
             `;
             tbody.appendChild(tr);
         });
-        localStorage.setItem(`mangaData_${currentUser}`, JSON.stringify(mangaList));
+        localStorage.setItem('mangaListData', JSON.stringify(mangaList));
     }
 
     function toggleRowType(index) {
@@ -336,7 +253,7 @@
 
     function updateRowValue(index, newValue) {
         mangaList[index].value = newValue.trim();
-        localStorage.setItem(`mangaData_${currentUser}`, JSON.stringify(mangaList));
+        localStorage.setItem('mangaListData', JSON.stringify(mangaList));
     }
 
     function addManga() {
@@ -372,7 +289,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mangaList, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `manga_${currentUser}_backup_${new Date().toISOString().slice(0,10)}.json`);
+        downloadAnchor.setAttribute("download", `manga_backup_${new Date().toISOString().slice(0,10)}.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
@@ -386,7 +303,7 @@
                 if (Array.isArray(imported)) {
                     mangaList = imported;
                     render();
-                    alert(`成功匯入資料至 [${currentUser}]！`);
+                    alert('備份匯入成功！');
                 }
             } catch (err) {
                 alert('檔案格式錯誤，無法匯入');
@@ -395,7 +312,7 @@
         reader.readAsText(event.target.files[0]);
     }
 
-    initUserSelect();
+    render();
 </script>
 
 </body>
