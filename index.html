@@ -3,349 +3,613 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>漫畫追更記錄本</title>
+    <title>香香漫畫進度</title>
     <style>
         :root {
-            --bg-color: #f4f6f9;
+            --primary-green: #00c775;
+            --primary-green-hover: #00b067;
+            --bg-color: #f7f9f8;
             --card-bg: #ffffff;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --danger: #ef4444;
-            --text-color: #333333;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
             --border-color: #e5e7eb;
+            --tag-green-bg: #e6f9f0;
+            --tag-green-text: #00a862;
+            --tag-blue-bg: #eef2ff;
+            --tag-blue-text: #4f46e5;
+            --tag-gray-bg: #f3f4f6;
+            --tag-gray-text: #6b7280;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
-            padding: 12px;
+            padding: 24px 16px;
             display: flex;
             justify-content: center;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
+            max-width: 960px;
+        }
+
+        /* 頂部 Header */
+        .badge-sub {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--primary-green);
+            background: var(--tag-green-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
 
         h1 {
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 16px;
-            font-size: 1.4rem;
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0 0 6px 0;
             color: #111827;
         }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .sub-notice {
+            font-size: 12px;
+            color: var(--text-sub);
             margin-bottom: 20px;
-            background-color: #f9fafb;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .input-row-1, .input-row-2 {
             display: flex;
-            gap: 8px;
-            width: 100%;
+            align-items: center;
+            gap: 4px;
         }
 
-        input[type="text"] {
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 15px;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--primary);
-        }
-
-        #mangaName, #mangaProgress {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .toggle-btn {
-            padding: 8px 14px;
-            background-color: #e5e7eb;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
-            user-select: none;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .toggle-btn.active-main {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #2563eb;
-        }
-
-        .toggle-btn.active-extra {
-            background-color: #f59e0b;
-            color: white;
-            border-color: #d97706;
-        }
-
-        button.btn-primary {
-            padding: 10px 16px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        button.btn-primary:hover { background-color: var(--primary-hover); }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-
-        /* 漫畫列表：分兩行的卡片樣式 */
-        .manga-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .manga-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: #fff;
-        }
-
-        .manga-title {
-            font-weight: bold;
+        .sub-notice::before {
+            content: "•";
+            color: var(--primary-green);
             font-size: 16px;
-            color: #1f2937;
+        }
+
+        /* 統計資訊欄 */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-sub);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-item span {
+            color: var(--text-main);
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        /* 控制與搜尋列 */
+        .controls-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            background: #e5e7eb;
+            color: var(--text-sub);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-green);
+        }
+
+        .btn-add {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-add:hover { background: var(--primary-green-hover); }
+
+        .backup-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .btn-outline:hover { background: #f9fafb; }
+
+        /* 卡片網格 Grid */
+        .manga-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .status-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .status-tag.連載中 { background: var(--tag-green-bg); color: var(--tag-green-text); }
+        .status-tag.已完結 { background: var(--tag-blue-bg); color: var(--tag-blue-text); }
+        .status-tag.棄追 { background: var(--tag-gray-bg); color: var(--tag-gray-text); }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            color: #9ca3af;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px;
+        }
+
+        .icon-btn:hover { color: #374151; }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            line-height: 1.4;
             word-break: break-word;
         }
 
-        .manga-controls {
+        /* 數字微調器 (Stepper) */
+        .stepper-group {
             display: flex;
-            gap: 8px;
             align-items: center;
-            width: 100%;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 3px;
+            gap: 4px;
         }
 
-        .manga-controls input[type="text"] {
-            flex: 1;
-            min-width: 0;
-            padding: 8px 10px;
-            font-size: 15px;
+        .type-badge {
+            background: var(--primary-green);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
         }
 
-        .tools {
+        .type-badge.extra {
+            background: #f59e0b;
+        }
+
+        .stepper-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            font-weight: bold;
+            color: var(--text-main);
+            cursor: pointer;
             display: flex;
-            gap: 10px;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border-color);
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
         }
 
-        .tools button {
+        .stepper-btn:hover { background: #f3f4f6; }
+
+        .stepper-input {
             flex: 1;
-            font-size: 13px;
-            padding: 10px 4px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        /* Modal 彈出視窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 100;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-sub); }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>📚 漫畫追更記錄本</h1>
-    
-    <!-- 新增漫畫欄位 -->
-    <div class="input-group">
-        <div class="input-row-1">
-            <input type="text" id="mangaName" placeholder="漫畫名稱（例如：魔咒）">
+    <div class="badge-sub">READING LEDGER</div>
+    <h1>香香漫畫進度</h1>
+    <div class="sub-notice">遵循條款：資料存在這台裝置的瀏覽器裡</div>
+
+    <!-- 頂部統計欄 -->
+    <div class="stats-bar">
+        <div class="stat-item">共 <span id="statTotal">0</span> 部</div>
+        <div class="stat-item">連載中 <span id="statOngoing">0</span></div>
+        <div class="stat-item">許久未續 <span id="statDropped">0</span></div>
+    </div>
+
+    <!-- 搜尋與頁籤 -->
+    <div class="controls-bar">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="setTab('全部', this)">全部 (<span id="tabAll">0</span>)</button>
+            <button class="tab-btn" onclick="setTab('連載中', this)">連載中 (<span id="tabOngoing">0</span>)</button>
+            <button class="tab-btn" onclick="setTab('已完結', this)">已完結 (<span id="tabCompleted">0</span>)</button>
+            <button class="tab-btn" onclick="setTab('棄追', this)">棄追 (<span id="tabDropped">0</span>)</button>
         </div>
-        <div class="input-row-2">
-            <button type="button" id="typeToggle" class="toggle-btn active-main" onclick="toggleTypeInput()">正傳</button>
-            <input type="text" id="mangaProgress" placeholder="話數（例：60）">
-            <button class="btn-primary" onclick="addManga()">新增/更新</button>
+
+        <div class="filter-row">
+            <input type="text" id="searchInput" class="search-input" placeholder="搜尋漫畫名稱..." oninput="render()">
+            <button class="btn-add" onclick="openModal()">＋ 新增漫畫</button>
         </div>
     </div>
 
-    <!-- 漫畫列表清單（手機優化雙行版） -->
-    <div id="mangaList" class="manga-list"></div>
-
-    <!-- 資料匯入匯出備份 -->
-    <div class="tools">
-        <button class="btn-primary" onclick="exportData()" style="background-color: #059669;">匯出備份</button>
-        <button class="btn-primary" onclick="document.getElementById('importFile').click()" style="background-color: #d97706;">匯入備份</button>
+    <!-- 備份按鈕 -->
+    <div class="backup-btns">
+        <button class="btn-outline" onclick="exportData()">↓ 匯出備份</button>
+        <button class="btn-outline" onclick="document.getElementById('importFile').click()">↑ 匯入備份</button>
         <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
+    </div>
+
+    <!-- 漫畫卡片網格 -->
+    <div id="mangaGrid" class="manga-grid"></div>
+</div>
+
+<!-- 新增/編輯彈窗 -->
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-title" id="modalHeader">新增漫畫</div>
+        <div class="form-group">
+            <label>漫畫名稱</label>
+            <input type="text" id="formName" class="form-control" placeholder="輸入名稱">
+        </div>
+        <div class="form-group">
+            <label>進度類別</label>
+            <select id="formType" class="form-control">
+                <option value="main">正傳</option>
+                <option value="extra">外傳</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>目前話數 / 內容</label>
+            <input type="text" id="formValue" class="form-control" placeholder="例：60 或 14">
+        </div>
+        <div class="form-group">
+            <label>狀態</label>
+            <select id="formStatus" class="form-control">
+                <option value="連載中">連載中</option>
+                <option value="已完結">已完結</option>
+                <option value="棄追">棄追</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn-add" onclick="saveManga()">儲存</button>
+        </div>
     </div>
 </div>
 
 <script>
-    let currentInputType = 'main';
+    let currentTab = '全部';
 
+    // 預設資料
     const initialData = [
-        { name: "1995青春報告", type: "main", value: "60" },
-        { name: "疏導危機", type: "main", value: "86" },
-        { name: "PASSION", type: "main", value: "138" },
-        { name: "素描", type: "extra", value: "14" },
-        { name: "不要招惹小狗", type: "extra", value: "13" },
-        { name: "珍珠少年", type: "extra", value: "發火尾聲 3" },
-        { name: "恩寵之夜", type: "main", value: "21" },
-        { name: "魔咒", type: "main", value: "102" },
-        { name: "獵人想要平靜的生活", type: "main", value: "66" },
-        { name: "親屬關係證明", type: "main", value: "25" },
-        { name: "Sweet Sugar Candyman", type: "main", value: "15" },
-        { name: "弗林的狐狸飲料", type: "main", value: "67" },
-        { name: "請公私分明", type: "main", value: "94" },
-        { name: "Hit Me Hard", type: "main", value: "35" },
-        { name: "UNSLEEP", type: "main", value: "78" },
-        { name: "Unnormal", type: "main", value: "12" },
-        { name: "STAGE BEHIND", type: "main", value: "41" },
-        { name: "Happy Twogether", type: "main", value: "33" },
-        { name: "讓我來介紹我的經紀人", type: "main", value: "19" },
-        { name: "Shutline", type: "main", value: "113" },
-        { name: "融冰曲線", type: "main", value: "33" },
-        { name: "Alpha創傷", type: "main", value: "43" },
-        { name: "不想看我發瘋的話，就給我生隻小豹貓！", type: "main", value: "33" },
-        { name: "應念而至", type: "main", value: "59" }
+        { name: "1995青春報告", type: "main", value: "60", status: "連載中" },
+        { name: "疏導危機", type: "main", value: "86", status: "連載中" },
+        { name: "PASSION", type: "main", value: "138", status: "連載中" },
+        { name: "素描", type: "extra", value: "14", status: "連載中" },
+        { name: "不要招惹小狗", type: "extra", value: "13", status: "連載中" },
+        { name: "珍珠少年", type: "extra", value: "發火尾聲 3", status: "已完結" },
+        { name: "恩寵之夜", type: "main", value: "21", status: "連載中" },
+        { name: "魔咒", type: "main", value: "102", status: "連載中" },
+        { name: "獵人想要平靜的生活", type: "main", value: "66", status: "連載中" },
+        { name: "親屬關係證明", type: "main", value: "25", status: "連載中" },
+        { name: "Sweet Sugar Candyman", type: "main", value: "15", status: "連載中" },
+        { name: "弗林的狐狸飲料", type: "main", value: "67", status: "連載中" },
+        { name: "請公私分明", type: "main", value: "94", status: "連載中" },
+        { name: "Hit Me Hard", type: "main", value: "35", status: "連載中" },
+        { name: "UNSLEEP", type: "main", value: "78", status: "連載中" },
+        { name: "Unnormal", type: "main", value: "12", status: "連載中" },
+        { name: "STAGE BEHIND", type: "main", value: "41", status: "連載中" },
+        { name: "Happy Twogether", type: "main", value: "33", status: "連載中" },
+        { name: "讓我來介紹我的經紀人", type: "main", value: "19", status: "連載中" },
+        { name: "Shutline", type: "main", value: "113", status: "連載中" },
+        { name: "融冰曲線", type: "main", value: "33", status: "連載中" },
+        { name: "Alpha創傷", type: "main", value: "43", status: "連載中" },
+        { name: "不想看我發瘋的話，就給我生隻小豹貓！", type: "main", value: "33", status: "連載中" },
+        { name: "應念而至", type: "main", value: "59", status: "連載中" }
     ];
 
     let mangaList = JSON.parse(localStorage.getItem('mangaListData')) || initialData;
 
-    function toggleTypeInput() {
-        const btn = document.getElementById('typeToggle');
-        if (currentInputType === 'main') {
-            currentInputType = 'extra';
-            btn.textContent = '外傳';
-            btn.className = 'toggle-btn active-extra';
-        } else {
-            currentInputType = 'main';
-            btn.textContent = '正傳';
-            btn.className = 'toggle-btn active-main';
-        }
-    }
-
     function render() {
-        const listContainer = document.getElementById('mangaList');
-        listContainer.innerHTML = '';
-        mangaList.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'manga-item';
-            
-            const isMain = item.type !== 'extra';
-            const btnClass = isMain ? 'toggle-btn active-main' : 'toggle-btn active-extra';
-            const btnText = isMain ? '正傳' : '外傳';
+        const grid = document.getElementById('mangaGrid');
+        const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
+        grid.innerHTML = '';
 
-            div.innerHTML = `
-                <div class="manga-title">${item.name}</div>
-                <div class="manga-controls">
-                    <button type="button" class="${btnClass}" onclick="toggleRowType(${index})">${btnText}</button>
-                    <input type="text" value="${item.value}" onchange="updateRowValue(${index}, this.value)">
-                    <button class="btn-danger" onclick="deleteManga(${index})">刪除</button>
+        // 更新數據統計
+        const total = mangaList.length;
+        const ongoing = mangaList.filter(m => m.status === '連載中').length;
+        const completed = mangaList.filter(m => m.status === '已完結').length;
+        const dropped = mangaList.filter(m => m.status === '棄追').length;
+
+        document.getElementById('statTotal').textContent = total;
+        document.getElementById('statOngoing').textContent = ongoing;
+        document.getElementById('statDropped').textContent = dropped;
+
+        document.getElementById('tabAll').textContent = total;
+        document.getElementById('tabOngoing').textContent = ongoing;
+        document.getElementById('tabCompleted').textContent = completed;
+        document.getElementById('tabDropped').textContent = dropped;
+
+        // 篩選
+        const filtered = mangaList.filter(item => {
+            const matchTab = (currentTab === '全部') || (item.status === currentTab);
+            const matchSearch = item.name.toLowerCase().includes(searchKeyword);
+            return matchTab && matchSearch;
+        });
+
+        filtered.forEach((item) => {
+            const originalIndex = mangaList.indexOf(item);
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            const isExtra = item.type === 'extra';
+            const typeText = isExtra ? '外傳' : '正傳';
+            const typeClass = isExtra ? 'type-badge extra' : 'type-badge';
+
+            card.innerHTML = `
+                <div>
+                    <div class="card-header">
+                        <span class="status-tag ${item.status || '連載中'}">${item.status || '連載中'}</span>
+                        <div class="card-actions">
+                            <button class="icon-btn" onclick="toggleStatus(${originalIndex})">⚙️</button>
+                            <button class="icon-btn" onclick="deleteManga(${originalIndex})">✕</button>
+                        </div>
+                    </div>
+                    <div class="card-title">${item.name}</div>
+                </div>
+                <div class="stepper-group">
+                    <div class="${typeClass}" onclick="toggleType(${originalIndex})">${typeText}</div>
+                    <button class="stepper-btn" onclick="changeValue(${originalIndex}, -1)">-1</button>
+                    <input type="text" class="stepper-input" value="${item.value}" onchange="updateValue(${originalIndex}, this.value)">
+                    <button class="stepper-btn" onclick="changeValue(${originalIndex}, 1)">+1</button>
                 </div>
             `;
-            listContainer.appendChild(div);
+            grid.appendChild(card);
         });
+
         localStorage.setItem('mangaListData', JSON.stringify(mangaList));
     }
 
-    function toggleRowType(index) {
-        mangaList[index].type = (mangaList[index].type === 'extra') ? 'main' : 'extra';
+    function setTab(tabName, btn) {
+        currentTab = tabName;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
         render();
     }
 
-    function updateRowValue(index, newValue) {
-        mangaList[index].value = newValue.trim();
+    function changeValue(index, delta) {
+        let val = parseInt(mangaList[index].value);
+        if (!isNaN(val)) {
+            mangaList[index].value = Math.max(0, val + delta).toString();
+        } else {
+            mangaList[index].value = "1";
+        }
+        render();
+    }
+
+    function updateValue(index, val) {
+        mangaList[index].value = val.trim();
         localStorage.setItem('mangaListData', JSON.stringify(mangaList));
     }
 
-    function addManga() {
-        const nameInput = document.getElementById('mangaName');
-        const progressInput = document.getElementById('mangaProgress');
-        const name = nameInput.value.trim();
-        const value = progressInput.value.trim();
+    function toggleType(index) {
+        mangaList[index].type = mangaList[index].type === 'extra' ? 'main' : 'extra';
+        render();
+    }
 
-        if (!name) return alert('請輸入漫畫名稱');
-        if (!value) return alert('請輸入話數或內容');
-
-        const existingIndex = mangaList.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
-        if (existingIndex !== -1) {
-            mangaList[existingIndex].type = currentInputType;
-            mangaList[existingIndex].value = value;
-        } else {
-            mangaList.push({ name, type: currentInputType, value });
-        }
-
-        nameInput.value = '';
-        progressInput.value = '';
+    function toggleStatus(index) {
+        const statuses = ['連載中', '已完結', '棄追'];
+        let curr = mangaList[index].status || '連載中';
+        let next = statuses[(statuses.indexOf(curr) + 1) % statuses.length];
+        mangaList[index].status = next;
         render();
     }
 
     function deleteManga(index) {
-        if (confirm(`確定要刪除《${mangaList[index].name}》嗎？`)) {
+        if (confirm(`確定刪除《${mangaList[index].name}》？`)) {
             mangaList.splice(index, 1);
             render();
         }
     }
 
-    function exportData() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mangaList, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `manga_backup_${new Date().toISOString().slice(0,10)}.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
+    // Modal 控制
+    function openModal() {
+        document.getElementById('modalOverlay').style.display = 'flex';
     }
 
-    function importData(event) {
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('formName').value = '';
+        document.getElementById('formValue').value = '';
+    }
+
+    function saveManga() {
+        const name = document.getElementById('formName').value.trim();
+        const type = document.getElementById('formType').value;
+        const value = document.getElementById('formValue').value.trim() || "1";
+        const status = document.getElementById('formStatus').value;
+
+        if (!name) return alert('請輸入漫畫名稱');
+
+        const existingIndex = mangaList.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+        if (existingIndex !== -1) {
+            mangaList[existingIndex] = { name, type, value, status };
+        } else {
+            mangaList.unshift({ name, type, value, status });
+        }
+
+        closeModal();
+        render();
+    }
+
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mangaList, null, 2));
+        const a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `manga_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    }
+
+    function importData(e) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function(evt) {
             try {
-                const imported = JSON.parse(e.target.result);
+                const imported = JSON.parse(evt.target.result);
                 if (Array.isArray(imported)) {
                     mangaList = imported;
                     render();
                     alert('備份匯入成功！');
                 }
             } catch (err) {
-                alert('檔案格式錯誤，無法匯入');
+                alert('檔案格式不正確');
             }
         };
-        reader.readAsText(event.target.files[0]);
+        reader.readAsText(e.target.files[0]);
     }
 
     render();
